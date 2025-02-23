@@ -1,16 +1,11 @@
-import yfinance as yf
-import pywhatkit as kit
 from datetime import datetime, timedelta, timezone
-import matplotlib.pyplot as plt
-import pandas as pd
-import pandas_datareader.data as pdr
 import requests
 import time
 import pyautogui as pyag
 import pyperclip
-import os
 import subprocess
 import sys
+import config
 
 
 sys.stdout.reconfigure(encoding='utf-8')
@@ -18,10 +13,9 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 acoes_desejadas = ['VALE3', 'BBAS3', 'TAEE11', 'CMIG4', 'CSMG3', 'GGBR4', 'KLBN4', 'ISAE4']
 
-token = 'vXdjM4LPXwiHD2yAqmSy13'
+token = config.TOKEN
 
-num_wpp = "+5521969360654"
-
+num_wpp = config.NUM_WPP
 
 def obter_dados_acoes_br(acoes):
     """ Faz uma requisição individual para cada ação e retorna os dados do último mês """
@@ -98,7 +92,7 @@ def gerar_relatorio(dados_acoes):
             relatorio += (
                 f"📈 *{dados['ticker']}*\n"
                 f"💰 Preço Atual: *R$ {dados['preco_atual']:.2f}*\n"
-                f"📉 Fechamento Anterior: *R$ {dados['fechamento_anterior']:.2f}*\n"
+                f"📉 Fechamento Mês Anterior: *R$ {dados['fechamento_anterior']:.2f}*\n"
                 f"🔄 Variação: *{dados['variacao']:.2f}%* {emoji_variacao}\n\n"
             )
 
@@ -107,7 +101,7 @@ def gerar_relatorio(dados_acoes):
 
 dados_acoes = obter_dados_acoes_br(acoes_desejadas)
 mensagem = gerar_relatorio(dados_acoes)
-contato = "Padrão (você)"
+contato = config.CONTATO_PADRAO
 
 
 def abrir_whatsapp():
