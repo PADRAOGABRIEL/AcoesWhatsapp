@@ -1,3 +1,4 @@
+import pygetwindow as gw
 from datetime import datetime, timedelta, timezone
 import requests
 import time
@@ -18,7 +19,6 @@ token = config.TOKEN
 num_wpp = config.NUM_WPP
 
 def obter_dados_acoes_br(acoes):
-    """ Faz uma requisição individual para cada ação e retorna os dados do último mês """
     relatorio = []
 
     for ticker in acoes:
@@ -103,14 +103,16 @@ dados_acoes = obter_dados_acoes_br(acoes_desejadas)
 mensagem = gerar_relatorio(dados_acoes)
 contato = config.CONTATO_PADRAO
 
-
 def abrir_whatsapp():
-    """ Abre o WhatsApp Desktop instalado pela Microsoft Store """
     try:
-        # Primeira tentativa: Comando mais direto para abrir WhatsApp Desktop
         subprocess.run(["cmd", "/c", "start whatsapp://"])
+        time.sleep(5)  
 
-        time.sleep(5)  # Aguarda o aplicativo abrir
+        for window in gw.getWindowsWithTitle("WhatsApp"):
+            if window and not window.isMaximized:
+                window.maximize()
+                time.sleep(1) 
+
     except Exception as e:
         print(f"❌ Erro ao abrir WhatsApp: {e}")
 
@@ -121,19 +123,18 @@ def enviar_whatsapp_desktop(contato, mensagem):
     abrir_whatsapp()
     
     time.sleep(2)
-    #  Clicar na barra de pesquisa (ajuste se necessário)
-    pyag.click(x=1113, y=126)
+
+    pyag.click(x=350, y=125)
     time.sleep(2)
 
-    #  Digitar o nome do contato/grupo e pressionar ENTER
+
     pyperclip.copy(contato)
     pyag.hotkey("ctrl", "v")
     time.sleep(1)
-    pyag.click(x=1160, y=180)
+    pyag.click(x=310, y=190)
     time.sleep(2)
-    pyag.click(x=1490, y=1000)
+    pyag.click(x=1140, y=1015)
 
-    #  Digitar a mensagem e enviar
     pyperclip.copy(mensagem)
     pyag.hotkey("ctrl", "v")
     time.sleep(1)
@@ -141,5 +142,4 @@ def enviar_whatsapp_desktop(contato, mensagem):
 
     print("✅ Mensagem enviada no WhatsApp Desktop!")
 
-# Executar o envio
 enviar_whatsapp_desktop(contato, mensagem)
